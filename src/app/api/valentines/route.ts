@@ -3,9 +3,6 @@ import { CreateValentineInput, VALIDATION } from "@/types/valentine";
 import { generateSlug } from "@/lib/slug";
 import { isFirebaseAdminConfigured } from "@/lib/firebase-admin";
 
-// In-memory store for development (when Firebase isn't configured)
-const devStore = new Map<string, { slug: string; fromName: string; toName: string; finalMessage?: string; createdAt: Date }>();
-
 /**
  * POST /api/valentines
  * Creates a new Valentine and returns the shareable URL
@@ -56,25 +53,7 @@ export async function POST(request: NextRequest) {
       });
       slug = valentine.slug;
     } else {
-      // Use in-memory store for development
       slug = generateSlug();
-      
-      // Ensure unique slug
-      let retries = 0;
-      while (devStore.has(slug) && retries < 5) {
-        slug = generateSlug();
-        retries++;
-      }
-
-      devStore.set(slug, {
-        slug,
-        fromName: fromName.trim(),
-        toName: toName.trim(),
-        finalMessage: finalMessage?.trim() || undefined,
-        createdAt: new Date(),
-      });
-
-      console.log(`[DEV MODE] Created valentine: ${slug}`, devStore.get(slug));
     }
 
     // Build the shareable URL
@@ -126,18 +105,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, valentine });
   } else {
     // Use in-memory store for development
-    const valentine = devStore.get(slug);
-    
-    if (!valentine) {
-      return NextResponse.json(
-        { success: false, error: "Valentine not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ success: true, valentine });
   }
 }
-
-// Export dev store for use in other files during development
-export { devStore };
