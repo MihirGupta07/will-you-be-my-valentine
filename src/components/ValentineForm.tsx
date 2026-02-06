@@ -41,6 +41,7 @@ const MESSAGE_PLACEHOLDERS = [
 
 export default function ValentineForm() {
   const [formState, setFormState] = useState<FormState>("idle");
+  const defaultFinalMessage = MESSAGE_PLACEHOLDERS[Math.floor(Math.random() * MESSAGE_PLACEHOLDERS.length)]
   const [formData, setFormData] = useState<FormData>({
     fromName: "",
     toName: "",
@@ -54,7 +55,7 @@ export default function ValentineForm() {
   const [placeholders] = useState(() => ({
     fromName: NAME_PLACEHOLDERS[Math.floor(Math.random() * NAME_PLACEHOLDERS.length)],
     toName: THEIR_NAME_PLACEHOLDERS[Math.floor(Math.random() * THEIR_NAME_PLACEHOLDERS.length)],
-    finalMessage: MESSAGE_PLACEHOLDERS[Math.floor(Math.random() * MESSAGE_PLACEHOLDERS.length)],
+    finalMessage: defaultFinalMessage,
   }));
 
   const handleChange = (
@@ -73,7 +74,7 @@ export default function ValentineForm() {
       const response = await fetch("/api/valentines", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, finalMessage: formData.finalMessage || defaultFinalMessage }  ),
       });
 
       const data = await response.json();
