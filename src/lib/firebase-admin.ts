@@ -73,7 +73,7 @@ function initializeFirebaseAdmin(): { app: App | null; db: Firestore | null } {
 // Initialize on module load
 const firebase = initializeFirebaseAdmin();
 
-export const adminDb = firebase.db;
+export const adminDb = firebase.db!;
 export const adminApp = firebase.app;
 export const isFirebaseAdminConfigured = (): boolean => firebase.db !== null;
 export const getInitError = (): Error | null => initError;
